@@ -87,6 +87,7 @@ void ps_command(int n, char *argv[]){
 	vTaskList(buf);
         fio_printf(1, "\n\rName          State   Priority  Stack  Num\n\r");
         fio_printf(1, "*******************************************\n\r");
+
 	fio_printf(1, "%s\r\n", buf + 2);	
 }
 
@@ -123,6 +124,7 @@ void host_command(int n, char *argv[]){
             len += (strlen(argv[i]) + 1);
             command[len - 1] = ' ';
         }
+
         command[len - 1] = '\0';
         rnt=host_action(SYS_SYSTEM, command);
         fio_printf(1, "\r\nfinish with exit code %d.\r\n", rnt);
@@ -139,12 +141,23 @@ void help_command(int n,char *argv[]){
 		fio_printf(1, "%s - %s\r\n", cl[i].name, cl[i].desc);
 	}
 }
+int myatoi(const char* str){
+	int result=0;
+	while(*str!='\0'){
+		result*=10;
+		result+=*str-'0';
+		str++;
+	}
+	return result;
+}
+
 
 void test_command(int n, char *argv[]) {
     int handle;
     int error;
 
-    fio_printf(1, "\r\n");
+    
+	fio_printf(1, "\r\n");
 
     handle = host_action(SYS_OPEN, "output/syslog", 8);
     if(handle == -1) {
@@ -152,7 +165,38 @@ void test_command(int n, char *argv[]) {
         return;
     }
 
-    char *buffer = "Test host_write function which can write data to output/syslog\n";
+    int i, len = 0;
+    char command[128] = {0};
+
+    if(n>1){
+        for(i = 1; i < n; i++) {
+            memcpy(&command[len], argv[i], strlen(argv[i]));
+            len += (strlen(argv[i]) + 1);
+            command[len - 1] = ' ';
+        }
+        command[len - 1] = '\0';
+    } 
+    else {
+        fio_printf(2, "\r\nUsage: host 'command'\r\n");
+    }
+
+
+     int primeCount=0;
+     int countScope=0;
+	 countScope = myatoi(command);
+     for(i=2;i<=countScope;i++){
+         primeCount++;
+         int j;
+         for(j=2;j*j<=i;j++){
+             if(i%j == 0){
+                 primeCount--;
+                 break;
+             }
+        }
+     }
+	fio_printf(1,"countScope:~%d\n\rPrimeCount:%d\n\r",countScope,primeCount);
+    char *buffer = "Count Success ! total prime !";
+	
     error = host_action(SYS_WRITE, handle, (void *)buffer, strlen(buffer));
     if(error != 0) {
         fio_printf(1, "Write file error! Remain %d bytes didn't write in the file.\n\r", error);
@@ -161,6 +205,7 @@ void test_command(int n, char *argv[]) {
     }
 
     host_action(SYS_CLOSE, handle);
+
 }
 
 cmdfunc *do_command(const char *cmd){
