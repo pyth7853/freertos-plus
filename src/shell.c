@@ -38,6 +38,12 @@ cmdlist cl[]={
 	MKCL(test, "test new function")
 };
 
+extern const unsigned char _sromfs;
+static uint32_t get_unaligned(const uint8_t * d) {
+    return ((uint32_t) d[0]) | ((uint32_t) (d[1] << 8)) | ((uint32_t) (d[2] << 16)) | ((uint32_t) (d[3] << 24));
+}
+
+
 int parse_command(char *str, char *argv[]){
 	int b_quote=0, b_dbquote=0;
 	int i;
@@ -59,9 +65,7 @@ int parse_command(char *str, char *argv[]){
 	return count;
 }
 
-void ls_command(int n, char *argv[]){
 
-}
 
 int filedump(const char *filename){
 	char buf[128];
@@ -81,7 +85,14 @@ int filedump(const char *filename){
 	fio_close(fd);
 	return 1;
 }
-
+void ls_command(int n, char *argv[]){
+	const uint8_t * meta;
+	meta=&_sromfs;
+	for(meta = &_sromfs;get_unaligned(meta) && get_unaligned(meta + 4);meta += get_unaligned(meta + 4) + 28){
+        fio_printf(1,"\r\n%s",(meta + 8)); 
+	}		    
+    fio_printf(1,"\r\n");
+}
 void ps_command(int n, char *argv[]){
 	signed char buf[1024];
 	vTaskList(buf);
