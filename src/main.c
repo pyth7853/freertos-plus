@@ -163,7 +163,7 @@ void count_prime_number(void *pvParameters)
     }
 
     int i, len = 0;
-    char command[128] = {0};
+    char command[] = {0};
 
     if(n>1){
         for(i = 1; i < n; i++) {
