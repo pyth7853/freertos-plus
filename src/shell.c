@@ -161,8 +161,29 @@ int myatoi(const char* str){
 	}
 	return result;
 }
+void myitoa(char* buf, int num){
+    int digit=0;
+    int tempNum=num;
+	do{ 
+        tempNum = tempNum/10;
+		digit+=1;
+	}while(tempNum);
+	
+    int toolNum=1;
+    int i;
+    for(i=0;i<(digit-1);i++){
+        toolNum*=10;
+	}
 
+    for(i=0;i<digit;i++){
+        buf[i] = (char)(num/toolNum)+'0';
+		num = num % toolNum;
+		toolNum = toolNum/10;
+    }
+	buf[i] = ';';
+	buf[i+1] = '\0';
 
+}
 void test_command(int n, char *argv[]) {
     int handle;
     int error;
@@ -170,7 +191,7 @@ void test_command(int n, char *argv[]) {
     
 	fio_printf(1, "\r\n");
 
-    handle = host_action(SYS_OPEN, "output/syslog", 8);
+    handle = host_action(SYS_OPEN, "output/prime number", 8);
     if(handle == -1) {
         fio_printf(1, "Open file error!\n\r");
         return;
@@ -206,8 +227,9 @@ void test_command(int n, char *argv[]) {
         }
      }
 	fio_printf(1,"countScope:~%d\n\rPrimeCount:%d\n\r",countScope,primeCount);
-    char *buffer = "Count Success ! total prime !";
-	
+    
+    char buffer[]={0};
+    myitoa(buffer, primeCount);
     error = host_action(SYS_WRITE, handle, (void *)buffer, strlen(buffer));
     if(error != 0) {
         fio_printf(1, "Write file error! Remain %d bytes didn't write in the file.\n\r", error);
@@ -216,7 +238,7 @@ void test_command(int n, char *argv[]) {
     }
 
     host_action(SYS_CLOSE, handle);
-
+  
 }
 
 cmdfunc *do_command(const char *cmd){
