@@ -93,7 +93,7 @@ void command_prompt(void *pvParameters)
 
 	fio_printf(1, "\rWelcome to FreeRTOS Shell\r\n");
 	while(1){
-                fio_printf(1, "%s", hint);
+        fio_printf(1, "%s", hint);
 		fio_read(0, buf, 127);
 	
 		int n=parse_command(buf, argv);
@@ -148,39 +148,12 @@ void system_logger(void *pvParameters)
 }
 
 void count_prime_number(void *pvParameters)
-{
-/*
-   int handle;
-    int error;
+{   const portTickType xDelay = 100000;
 
-    
-	fio_printf(1, "\r\n");
-
-    handle = host_action(SYS_OPEN, "output/syslog", 8);
-    if(handle == -1) {
-        fio_printf(1, "Open file error!\n\r");
-        return;
-    }
-
-    int i, len = 0;
-    char command[] = {0};
-
-    if(n>1){
-        for(i = 1; i < n; i++) {
-            memcpy(&command[len], argv[i], strlen(argv[i]));
-            len += (strlen(argv[i]) + 1);
-            command[len - 1] = ' ';
-        }
-        command[len - 1] = '\0';
-    } 
-    else {
-        fio_printf(2, "\r\nUsage: host 'command'\r\n");
-    }
-*/
-
+	while(1){
 	    int i;
      	int primeCount=0;
-     	int countScope=1000000;
+     	int countScope=10;
 //	 	countScope = myatoi(command);
      	for(i=2;i<=countScope;i++){
         	primeCount++;
@@ -193,20 +166,11 @@ void count_prime_number(void *pvParameters)
         	}
      	}
 		fio_printf(1,"\n\r");
-		fio_printf(1,"countScope:~%d\n\rPrimeCount:%d\n\r",countScope,primeCount);
+		fio_printf(1,"CountByTask:\n\rcountScope:~%d\n\rPrimeCount:%d\n\r",countScope,primeCount);
 		fio_printf(1,"\n\r");
-	
-//    char *buffer = "Count Success ! total prime !";
-	
-//    error = host_action(SYS_WRITE, handle, (void *)buffer, strlen(buffer));
-//    if(error != 0) {
-//        fio_printf(1, "Write file error! Remain %d bytes didn't write in the file.\n\r", error);
-//        host_action(SYS_CLOSE, handle);
-//        return;
-//    }
+	 	vTaskDelay(xDelay);
 
-//    host_action(SYS_CLOSE, handle);
-	while(1);
+	}
 }
 int main()
 {
